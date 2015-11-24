@@ -2,8 +2,9 @@
 #define QMPLAYERWIDGET_H
 
 #include <QWidget>
+#include <QProcess>
 
-class QmplayerWidget : public QWidget
+class QmplayerWidget : public QWidget, public QProcess
 {
    Q_OBJECT
 
