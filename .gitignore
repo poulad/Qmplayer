@@ -32,4 +32,7 @@ Makefile*
 #QtCtreator Qml
 *.qmlproject.user
 *.qmlproject.user.*
+<<<<<<< HEAD
 
+=======
+>>>>>>> 631b0a792e70460eadc93b9c9aa41b211aa624c6
