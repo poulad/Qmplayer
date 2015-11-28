@@ -13,11 +13,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        qmplayerwidget.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    qmplayerwidget.cpp
 
-HEADERS  += qmplayerwidget.h \
-    mainwindow.h
+HEADERS  += \
+    mainwindow.h \
+    qmplayerwidget.h
 
 FORMS += \
     mainwindow.ui
