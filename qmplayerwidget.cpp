@@ -5,6 +5,7 @@ QmplayerWidget::QmplayerWidget(QWidget *widget)
 {
    setAcceptDrops(true);
 
+   m_PositionRegex.setPattern("A:\\s*(\\d+).(\\d+)\\s*V:\\s*(\\d+).(\\d+)\\s*");
    m_VolumeRegex.setPattern("ANS_volume=(\\d+).(\\d+)");
 
    m_Process = new QProcess(this);
@@ -18,11 +19,10 @@ QmplayerWidget::QmplayerWidget(QWidget *widget)
          << "-wid" << QString::number(winId())
          << "-noconfig" << "all"
          << "-ass"
+         << "-volume" << "100"
             ;
    m_Process->setArguments(m_ArgumentsList);
    m_Process->start(QIODevice::ReadWrite);
-   if (m_Process->waitForStarted(5000) == true)
-      setVolume(100);
 }
 
 QmplayerWidget::~QmplayerWidget()
@@ -45,13 +45,16 @@ const QString& QmplayerWidget::log() const
 }
 
 
+
 //////////////////////////////////////////////////////////// Public Slots ////////////////////////////////////////////////////////////
+
 
 
 void QmplayerWidget::loadMedia(const QString & media)
 {
    m_Command = "loadfile \"" + media + "\" 0";
    sendCommand();
+   m_IsPlaying = true;
 }
 
 
@@ -62,6 +65,32 @@ void QmplayerWidget::playPause()
 
    m_Command = "pause";
    sendCommand();
+   m_IsPlaying = !m_IsPlaying;
+}
+
+
+void QmplayerWidget::pause()
+{
+   if(m_Process->isWritable() == false || m_IsPlaying == false)
+      return;
+   playPause();
+}
+
+
+void QmplayerWidget::seekTo(int deciSeconds)
+{
+   if(m_Process->isWritable() == false)
+      return;
+   m_Command = "pausing_keep seek " + QString::number(deciSeconds/10) + "." + QString::number(deciSeconds%10) + " 2";
+   sendCommand();
+}
+
+
+void QmplayerWidget::seekTo(const QTime &time)
+{
+   if(m_Process->isWritable() == false)
+      return;
+   seekTo( time.msecsSinceStartOfDay() / 100 );
 }
 
 
@@ -74,7 +103,9 @@ void QmplayerWidget::setVolume(int v)
 }
 
 
+
 //////////////////////////////////////////////////////////// Public Slots ////////////////////////////////////////////////////////////
+
 
 
 void QmplayerWidget::sendCommand()
@@ -109,12 +140,24 @@ void QmplayerWidget::dropEvent(QDropEvent *event)
 
 
 
-//////////////////////////////////////////////////////////// Private Slots ////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////// Private Slots /////////////////////////////////////////////////////////////
+
 
 
 void QmplayerWidget::readStdErr()
 {
-   m_Log += m_Process->readAllStandardError();
+   m_StdErr = m_Process->readAllStandardError();
+   m_Log += m_StdErr;
+   if(m_StdErr.contains(m_PositionRegex))
+   {
+      m_AudioPos = m_PositionRegex.cap(1).toInt() * 10 + m_PositionRegex.cap(2).toInt();
+      m_VideoPos = m_PositionRegex.cap(3).toInt() * 10 + m_PositionRegex.cap(4).toInt();
+      emit audioPosChanged(m_AudioPos);
+      emit videoPosChanged(m_VideoPos);
+      QTime time(0,0,0);
+      emit audioPosChanged(time.addMSecs(m_AudioPos * 100));
+      emit videoPosChanged(time.addMSecs(m_VideoPos * 100));
+   }
 }
 
 

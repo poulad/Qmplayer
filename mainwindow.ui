@@ -21,7 +21,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QmplayerWidget" name="widget" native="true">
+       <widget class="QmplayerWidget" name="mplayerWidget" native="true">
         <property name="acceptDrops">
          <bool>true</bool>
         </property>
@@ -30,7 +30,7 @@
       <item>
        <widget class="QSlider" name="volumeSlider">
         <property name="maximum">
-         <number>150</number>
+         <number>100</number>
         </property>
         <property name="singleStep">
          <number>5</number>
@@ -46,9 +46,38 @@
      </layout>
     </item>
     <item>
-     <widget class="QSlider" name="horizontalSlider">
+     <widget class="QSlider" name="positionSlider">
+      <property name="maximum">
+       <number>80506</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTimeEdit" name="timeEdit">
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="currentSection">
+       <enum>QDateTimeEdit::SecondSection</enum>
+      </property>
+      <property name="displayFormat">
+       <string>h:mm:ss.zzz</string>
+      </property>
+      <property name="timeSpec">
+       <enum>Qt::UTC</enum>
+      </property>
+      <property name="time">
+       <time>
+        <hour>0</hour>
+        <minute>0</minute>
+        <second>0</second>
+       </time>
       </property>
      </widget>
     </item>

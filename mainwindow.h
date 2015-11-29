@@ -14,21 +14,21 @@ class MainWindow : public QMainWindow
 {
    Q_OBJECT
 
-
 public:
    explicit MainWindow(QWidget *parent = 0);
    ~MainWindow();
 
 
+
 private slots:
    void on_buttonPlayPause_clicked();
    void on_buttonLog_clicked();
+   void on_positionSlider_sliderPressed();
+   void on_positionSlider_sliderReleased();
+
+
 
 private:
-
-
-
-
    Ui::MainWindow *ui;
    QTextEdit m_TextEdit;
 };
