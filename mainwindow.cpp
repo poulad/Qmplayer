@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
    ui->setupUi(this);
    connect(ui->volumeSlider, SIGNAL(valueChanged(int)), ui->mplayerWidget, SLOT(setVolume(int)));
    connect(ui->mplayerWidget, SIGNAL(videoPosChanged(int)), ui->positionSlider, SLOT(setValue(int)));
-   connect(ui->mplayerWidget, SIGNAL(videoPosChanged(QTime)), ui->timeEdit, SLOT(setTime(QTime)));
+   connect(ui->mplayerWidget, SIGNAL(videoPosChanged(QTime)), ui->positionTimeEdit, SLOT(setTime(QTime)));
 }
 
 
@@ -49,4 +49,18 @@ void MainWindow::on_positionSlider_sliderReleased()
 {
    disconnect(ui->positionSlider, SIGNAL(valueChanged(int)), ui->mplayerWidget, SLOT(seekTo(int)));
    connect(ui->mplayerWidget, SIGNAL(videoPosChanged(int)), ui->positionSlider, SLOT(setValue(int)));
+}
+
+
+void MainWindow::on_mplayerWidget_lengthChanged(int deciSeconds)
+{
+   qDebug() << QString::number(deciSeconds);
+   ui->positionSlider->setMaximum(deciSeconds/10);
+}
+
+
+void MainWindow::on_mplayerWidget_lengthChanged(QTime time)
+{
+   qDebug() << time;
+   ui->LengthTimeEdit->setTime(time);
 }

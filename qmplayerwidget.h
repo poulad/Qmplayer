@@ -10,7 +10,8 @@
 #include <QDropEvent>
 #include <QMimeData>
 
-#include <QDebug>
+#include "mediaid.h"
+
 
 class QmplayerWidget : public QWidget
 {
@@ -24,7 +25,7 @@ public:
    const QString& log() const;
 
 public slots:
-   void loadMedia(const QString&);
+   void loadMedia(const QString& media);
    void playPause();
    void pause();
    void seekTo(int deciSeconds);
@@ -37,6 +38,8 @@ signals:
    void audioPosChanged(int deciSeconds);
    void audioPosChanged(QTime);
    void volumeChanged(int percent);
+   void lengthChanged(int deciSeconds);
+   void lengthChanged(QTime);
 
 protected:
    void dragEnterEvent(QDragEnterEvent *event);
@@ -45,7 +48,7 @@ protected:
 private slots:
    void readStdErr();
    void readStdOut();
-
+   void readMediaId();
 
 private:
    inline void sendCommand();
@@ -54,6 +57,7 @@ private:
    QStringList m_ArgumentsList;
    QString m_StdOut;
    QString m_StdErr;
+   QString m_MediaIdStdOut;
    QString m_Log;
 
    QString m_mplayerAddress;
@@ -66,6 +70,8 @@ private:
    int m_VideoPos;
    int m_AudioPos;
    int m_Volume;
+
+   MediaID *m_MediaID;
 };
 
 #endif // QMPLAYERWIDGET_H

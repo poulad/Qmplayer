@@ -4,6 +4,7 @@ QmplayerWidget::QmplayerWidget(QWidget *widget)
    :  QWidget(widget)
 {
    setAcceptDrops(true);
+   m_mplayerAddress = "mplayer";
 
    m_PositionRegex.setPattern("A:\\s*(\\d+).(\\d+)\\s*V:\\s*(\\d+).(\\d+)\\s*");
    m_VolumeRegex.setPattern("ANS_volume=(\\d+).(\\d+)");
@@ -12,10 +13,14 @@ QmplayerWidget::QmplayerWidget(QWidget *widget)
    connect(m_Process, SIGNAL(readyReadStandardError()), this, SLOT(readStdErr()));
    connect(m_Process, SIGNAL(readyReadStandardOutput()), this, SLOT(readStdOut()));
 
-   m_Process->setProgram("mplayer");
+   m_MediaID = new MediaID(m_mplayerAddress, this);
+   connect(m_MediaID, SIGNAL(mediaIdentified()), this, SLOT(readMediaId()));
+
+   m_Process->setProgram(m_mplayerAddress);
    m_ArgumentsList
          << "-slave"
          << "-idle"
+         << "-identify"
          << "-wid" << QString::number(winId())
          << "-noconfig" << "all"
          << "-ass"
@@ -24,6 +29,7 @@ QmplayerWidget::QmplayerWidget(QWidget *widget)
    m_Process->setArguments(m_ArgumentsList);
    m_Process->start(QIODevice::ReadWrite);
 }
+
 
 QmplayerWidget::~QmplayerWidget()
 {
@@ -50,11 +56,10 @@ const QString& QmplayerWidget::log() const
 
 
 
-void QmplayerWidget::loadMedia(const QString & media)
+void QmplayerWidget::loadMedia(const QString &media)
 {
-   m_Command = "loadfile \"" + media + "\" 0";
-   sendCommand();
-   m_IsPlaying = true;
+   setEnabled(false);
+   m_MediaID->setMedia(media);
 }
 
 
@@ -79,8 +84,6 @@ void QmplayerWidget::pause()
 
 void QmplayerWidget::seekTo(int deciSeconds)
 {
-   if(m_Process->isWritable() == false)
-      return;
    m_Command = "pausing_keep seek " + QString::number(deciSeconds/10) + "." + QString::number(deciSeconds%10) + " 2";
    sendCommand();
 }
@@ -101,19 +104,6 @@ void QmplayerWidget::setVolume(int v)
    m_Command = "volume " + QString::number(v) + " 1";
    sendCommand();
 }
-
-
-
-//////////////////////////////////////////////////////////// Public Slots ////////////////////////////////////////////////////////////
-
-
-
-void QmplayerWidget::sendCommand()
-{
-   m_Command += "\n";
-   m_Process->write(m_Command.toLatin1());
-}
-
 
 
 
@@ -171,3 +161,32 @@ void QmplayerWidget::readStdOut()
       emit volumeChanged(m_Volume);
    }
 }
+
+
+void QmplayerWidget::readMediaId()
+{
+   if( m_MediaID->hasVideo() || m_MediaID->hasAudtio() )
+   {
+      emit lengthChanged(m_MediaID->length());
+      emit lengthChanged(QTime::fromMSecsSinceStartOfDay(m_MediaID->length() * 10));
+      setEnabled(true);
+      m_Command = "pausing_keep loadfile \"" + m_MediaID->fileName() + "\" 0";
+      sendCommand();
+   }
+
+}
+
+
+
+
+//////////////////////////////////////////////////////////// Private Functions ////////////////////////////////////////////////////////////
+
+
+
+
+void QmplayerWidget::sendCommand()
+{
+   m_Command += "\n";
+   m_Process->write(m_Command.toLatin1());
+}
+

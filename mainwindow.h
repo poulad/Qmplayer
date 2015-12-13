@@ -19,12 +19,13 @@ public:
    ~MainWindow();
 
 
-
 private slots:
    void on_buttonPlayPause_clicked();
    void on_buttonLog_clicked();
    void on_positionSlider_sliderPressed();
    void on_positionSlider_sliderReleased();
+   void on_mplayerWidget_lengthChanged(int deciSeconds);
+   void on_mplayerWidget_lengthChanged(QTime);
 
 
 
