@@ -9,6 +9,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QFileInfo>
 
 #include "mediaid.h"
 
@@ -23,9 +24,11 @@ public:
 
    int volume() const;
    const QString& log() const;
+   const MediaID *mediaId() const {return m_MediaID;}
 
 public slots:
    void loadMedia(const QString& media);
+   void loadSubtitle(const QString& sub);
    void playPause();
    void pause();
    void seekTo(int deciSeconds);

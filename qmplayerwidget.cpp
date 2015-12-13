@@ -23,6 +23,7 @@ QmplayerWidget::QmplayerWidget(QWidget *widget)
          << "-identify"
          << "-wid" << QString::number(winId())
          << "-noconfig" << "all"
+         << "-nosub"
          << "-ass"
          << "-volume" << "100"
             ;
@@ -60,6 +61,17 @@ void QmplayerWidget::loadMedia(const QString &media)
 {
    setEnabled(false);
    m_MediaID->setMedia(media);
+}
+
+
+void QmplayerWidget::loadSubtitle(const QString &sub)
+{
+   m_Command = "pausing_keep sub_remove 0";
+   sendCommand();
+   m_Command = "pausing_keep sub_load \"" + sub + "\"";
+   sendCommand();
+   m_Command = "pausing_keep sub_select 0";
+   sendCommand();
 }
 
 
@@ -122,10 +134,11 @@ void QmplayerWidget::dropEvent(QDropEvent *event)
 {
    QList<QUrl> urlList = event->mimeData()->urls();
    QFile file( urlList.first().toLocalFile() );
-   if(file.exists() == true)
-   {
+   QFileInfo fileInfo(file);
+   if( fileInfo.suffix().contains("srt", Qt::CaseInsensitive) || fileInfo.suffix().contains("ass", Qt::CaseInsensitive) || fileInfo.suffix().contains("ssa", Qt::CaseInsensitive) )
+      loadSubtitle(file.fileName());
+   else
       loadMedia(file.fileName());
-   }
 }
 
 
@@ -169,10 +182,11 @@ void QmplayerWidget::readMediaId()
    {
       emit lengthChanged(m_MediaID->length());
       emit lengthChanged(QTime::fromMSecsSinceStartOfDay(m_MediaID->length() * 10));
-      setEnabled(true);
       m_Command = "pausing_keep loadfile \"" + m_MediaID->fileName() + "\" 0";
       sendCommand();
    }
+
+   setEnabled(true);
 
 }
 

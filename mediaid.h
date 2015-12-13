@@ -4,6 +4,8 @@
 #include <QProcess>
 #include <QStringList>
 #include <QRegExp>
+#include <QFile>
+
 
 class MediaID : public QObject
 {
@@ -47,6 +49,7 @@ private slots:
    void identifyMedia(int);
 
 private:
+   void clear();
    void readAudioId();
    void readVideoId();
    void readSubtitleId();
@@ -55,6 +58,8 @@ private:
    QString m_mplayerAddress;
    QString m_StdOutErr;
    QStringList m_OutputLines;
+   QRegExp m_IdRegex;
+   QRegExp m_FileFormatRegex;
 
    QString m_Address;
    int m_Length;

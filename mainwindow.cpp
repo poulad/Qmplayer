@@ -54,13 +54,11 @@ void MainWindow::on_positionSlider_sliderReleased()
 
 void MainWindow::on_mplayerWidget_lengthChanged(int deciSeconds)
 {
-   qDebug() << QString::number(deciSeconds);
    ui->positionSlider->setMaximum(deciSeconds/10);
 }
 
 
 void MainWindow::on_mplayerWidget_lengthChanged(QTime time)
 {
-   qDebug() << time;
    ui->LengthTimeEdit->setTime(time);
 }
